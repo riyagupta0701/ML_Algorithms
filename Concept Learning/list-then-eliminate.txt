@@ -1,0 +1,61 @@
+import pandas as pd
+import numpy as np
+from itertools import product
+
+#to read the data in the csv file
+data = pd.read_csv("data2.csv")
+print(data)
+
+#making an array of all the attributes
+concepts = np.array(data)[:,:-1]
+print("\nThe attributes are: \n",concepts)
+
+#segregating the target that has positive and negative examples
+target = np.array(data)[:,-1]
+print("\nThe target is: \n",target)
+
+
+#creating the version space to include every hypothesis
+F1 = ['A','B']
+F2 = ['C','D']
+specific_hypothesis = list(np.repeat('phi', len(F1)))
+F1.append('?')
+F2.append('?')
+hypotheses = [list(h) for h in product(F1, F2)]
+hypotheses.append(specific_hypothesis)
+
+#creating the version space to include every hypothesis
+F1 = ['A','B']
+F2 = ['C','D']
+specific_hypothesis = list(np.repeat('phi', len(F1)))
+F1.append('?')
+F2.append('?')
+hypotheses = [list(h) for h in product(F1, F2)]
+hypotheses.append(specific_hypothesis)
+
+#comparison function to find consistent hypothesis
+def compare(x, y):
+    for i in range(2):
+        if x[i] == y[i] or y[i] == '?' or x[i] == '?':
+            continue
+        else:
+            return 'No'
+    return 'Yes'
+
+#training function to implement list-then-eliminate algorithm
+def train(c,t):
+    global version_space
+    for i, h in enumerate(hypotheses):
+        outcome = 1
+        for j, val in enumerate(c):
+            outcome = outcome and (t[j] == compare(hypotheses[i], val))  
+        if outcome == 1:
+            version_space.append(h)
+            
+#obtaining the final version space
+print("\nSemantically distinct hypotheses or initial version space")
+print(hypotheses)
+version_space = []
+train(concepts, target)
+print('\nFinal version_space')
+print(version_space)
